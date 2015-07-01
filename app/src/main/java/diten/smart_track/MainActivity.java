@@ -144,6 +144,6 @@ public class MainActivity extends ActionBarActivity {
             };
 
     public void monlapin(){
-        Toast.makeText(getApplicationContext(), "La vie n'est qu'un LoL", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "testeur de LoL", Toast.LENGTH_SHORT).show();
     }
 }

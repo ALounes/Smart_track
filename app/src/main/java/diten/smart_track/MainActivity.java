@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning ;
@@ -54,9 +53,6 @@ public class MainActivity extends ActionBarActivity {
         Beacon beacon2 = new Beacon("beacon2", 100, 500, 220, 40);
         Beacon beacon3 = new Beacon("beacon3", 3, 256, 504, 223);
         Beacon beacon4 = new Beacon("beacon4", 1, 256, 504, 223);
-        Beacon beacon5 = new Beacon("beacon5", 100, 256, 504, 223);
-        Beacon beacon6 = new Beacon("beacon6", 10000, 256, 504, 223);
-        Beacon beacon7 = new Beacon("beacon7", 1050, 256, 504, 223);
 
         final Cursor cursor = new Cursor();
 
@@ -66,10 +62,8 @@ public class MainActivity extends ActionBarActivity {
         list.add_beacon(beacon2);
         list.add_beacon(beacon3);
         list.add_beacon(beacon4);
-        list.add_beacon(beacon5);
-        list.add_beacon(beacon6);
-        list.add_beacon(beacon7);
-        list.print_list();
+
+        //list.print_list();
 
         Beacon1.setX(beacon1.getAbscissa());
         Beacon1.setY(beacon1.getOrdinate());
@@ -89,9 +83,9 @@ public class MainActivity extends ActionBarActivity {
                 float Y = event.getY();
                 Cursor(X, Y);
                 //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
-                Log.i("MainActivity", "La balise la plus proche est: " + list.min_distance(list));
+                Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
                 list.min_distance(list);
-                vibs.vibrate(100);
+                //vibs.vibrate(100);
                 return true;
             }
 

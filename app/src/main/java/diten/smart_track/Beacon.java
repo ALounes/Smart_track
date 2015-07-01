@@ -9,6 +9,7 @@ public class Beacon {
      float abscissa;
      float ordinate;
      float altitude;
+     boolean detected;
 
      Beacon(String addr_mac, int RSSI, float abscissa, float ordinate, float altitude){
         this.addr_mac = addr_mac;
@@ -16,6 +17,7 @@ public class Beacon {
         this.abscissa = abscissa;
         this.ordinate = ordinate;
         this.altitude = altitude;
+        this.detected = false;
     }
 
     void setAddr_mac(String addr_mac){
@@ -36,10 +38,10 @@ public class Beacon {
 
     void setAltitude(int altitude) { this.altitude = altitude; }
 
+    void setDetected(boolean detected) { this.detected = detected; }
+
     String get_addr_mac(){ return addr_mac; }
-    int getRSSI(){
-        return RSSI;
-    }
+    int getRSSI(){ return RSSI; }
     float getAbscissa(){
         return abscissa;
     }
@@ -47,4 +49,5 @@ public class Beacon {
         return ordinate;
     }
     float getAltitude() { return altitude; }
+    boolean getDectected(){ return detected;}
 }

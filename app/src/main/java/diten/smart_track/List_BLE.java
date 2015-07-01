@@ -1,8 +1,10 @@
 package diten.smart_track;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+
 
 /**
  * Created by matthieu on 26/06/15.
@@ -21,6 +23,10 @@ public class List_BLE {
 
     int size_list(){
         return list.size();
+    }
+
+    Beacon get_beacon(int index){
+        return (Beacon)list.get(index);
     }
 
     String get_addr_mac_index(int i){
@@ -43,6 +49,11 @@ public class List_BLE {
         return altitude;
     }
 
+    boolean get_detected_index(int i) {
+        boolean detected = ((Beacon) (list.get(i))).getDectected();
+        return detected;
+    }
+
     float get_RSSI_index(int i) {
         float RSSI = ((Beacon) (list.get(i))).getRSSI();
         return RSSI;
@@ -51,7 +62,7 @@ public class List_BLE {
     void print_list(){
         for(int i = 0; i < list.size(); i++){
             Log.i("List_BLE", " ABSCISSE: " + ((Beacon)(list.get(i))).getAbscissa() + " ORDONNNEE: " + ((Beacon)(list.get(i))).getOrdinate() + "ALTITUDE: " + ((Beacon)(list.get(i))).getAltitude() );
-            Log.i("List_BLE", " RSSI: " + ((Beacon)(list.get(i))).getRSSI() + " ADDR MAC: " + ((Beacon)(list.get(i))).get_addr_mac());
+            Log.i("List_BLE", " RSSI: " + ((Beacon) (list.get(i))).getRSSI() + " ADDR MAC: " + ((Beacon) (list.get(i))).get_addr_mac());
         }
     }
 
@@ -60,12 +71,31 @@ public class List_BLE {
         float RRSI = get_RSSI_index(0);
         String addr_mac = get_addr_mac_index(0);
         for(int i = 1; i < list_ble.size_list(); i++){
-            if(RRSI > get_RSSI_index(i)) {
+            if((RRSI > get_RSSI_index(i)) && (get_beacon(i).getDectected()== true)) {
                 RRSI = get_RSSI_index(i);
                 addr_mac = get_addr_mac_index(i);
             }
         }
         return addr_mac;
+    }
+
+    //Put attribute 'detected' to false for all beacons
+    public void list_clear_dectection(){
+        for (int i = 0; i < list.size(); i++){
+            (get_beacon(i)).setDetected(false);
+        }
+    }
+
+    //Find the beacon thanks to its mac adress
+    public void list_find_by_add(String addr_mac, int RSSI){
+        for (int i = 0; i < list.size(); i++){
+            if(get_addr_mac_index(i).compareTo(addr_mac) == 0) {
+                (get_beacon(i)).setRSSI(RSSI);
+                (get_beacon(i)).setDetected(true);
+            }
+            else
+                Log.i("List_BLE", "Impossible de trouver le beacon correspondant");
+        }
     }
 }
 

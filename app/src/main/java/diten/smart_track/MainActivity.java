@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
     ImageView Beacon2;
     ImageView Beacon3;
     public static Vibrator vibs;
+    List_BLE list = null;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 5000;
@@ -49,14 +50,14 @@ public class MainActivity extends Activity {
         Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
         mHandler = new Handler();
 
-        Beacon beacon1 = new Beacon("beacon1", 200, 150, 300, 220);
-        Beacon beacon2 = new Beacon("beacon2", 100, 500, 220, 40);
-        Beacon beacon3 = new Beacon("beacon3", 3, 256, 504, 223);
-        Beacon beacon4 = new Beacon("beacon4", 1, 256, 504, 223);
+        Beacon beacon1 = new Beacon("C2:CB:A5:BD:A2:86", 0, 150, 300, 220);
+        Beacon beacon2 = new Beacon("00:07:80:79:2D:A0", 0, 500, 220, 40);
+        Beacon beacon3 = new Beacon("beacon3", 0, 256, 504, 223);
+        Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
 
         final Cursor cursor = new Cursor();
 
-        final List_BLE list = new List_BLE();
+        list = new List_BLE();
 
         list.add_beacon(beacon1);
         list.add_beacon(beacon2);
@@ -86,6 +87,10 @@ public class MainActivity extends Activity {
                 Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
                 list.min_distance(list);
                 //vibs.vibrate(100);
+
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+
                 return true;
             }
 
@@ -151,7 +156,9 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }   @Override
+    }
+
+        @Override
         protected void onResume() {
         super.onResume();
 
@@ -211,8 +218,8 @@ public class MainActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), device + "-" + rssi, Toast.LENGTH_SHORT).show();
-
+                            Toast.makeText(getApplicationContext(), device + " | " + rssi, Toast.LENGTH_SHORT).show();
+                            list.list_find_by_add(device.toString(),rssi);
                         }
                     });
                 }

@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
 
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
-            Toast.makeText(this, "Bluetooth Not Supported", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bluetooth Not Supported ok", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

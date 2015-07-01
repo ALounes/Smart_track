@@ -9,10 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
@@ -21,6 +26,12 @@ public class MainActivity extends ActionBarActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning ;
     private Handler mHandler;
+    ImageView IMG;
+    ImageView Cursor;
+    ImageView Beacon1;
+    ImageView Beacon2;
+    ImageView Beacon3;
+    public static Vibrator vibs;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 5000;
@@ -31,7 +42,78 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        vibs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);   // The vibrator
+        Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
+        IMG = (ImageView) findViewById(R.id.imageView);
+        Beacon1 = (ImageView) findViewById(R.id.beacon1);       //The first beacon
+        Beacon2 = (ImageView) findViewById(R.id.beacon2);       //The second beacon
+        Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
         mHandler = new Handler();
+
+
+        Beacon beacon1 = new Beacon("beacon1", 200, 150, 300, 220);
+        Beacon beacon2 = new Beacon("beacon2", 100, 500, 220, 40);
+        Beacon beacon3 = new Beacon("beacon3", 3, 256, 504, 223);
+        Beacon beacon4 = new Beacon("beacon4", 1, 256, 504, 223);
+        Beacon beacon5 = new Beacon("beacon5", 100, 256, 504, 223);
+        Beacon beacon6 = new Beacon("beacon6", 10000, 256, 504, 223);
+        Beacon beacon7 = new Beacon("beacon7", 1050, 256, 504, 223);
+
+        final Cursor cursor = new Cursor();
+
+        final List_BLE list = new List_BLE();
+
+        list.add_beacon(beacon1);
+        list.add_beacon(beacon2);
+        list.add_beacon(beacon3);
+        list.add_beacon(beacon4);
+        list.add_beacon(beacon5);
+        list.add_beacon(beacon6);
+        list.add_beacon(beacon7);
+        list.print_list();
+
+        Beacon1.setX(beacon1.getAbscissa());
+        Beacon1.setY(beacon1.getOrdinate());
+        Beacon2.setX(beacon2.getAbscissa());
+        Beacon2.setY(beacon2.getOrdinate());
+        Beacon3.setX(beacon3.getAbscissa());
+        Beacon3.setY(beacon3.getOrdinate());
+
+        // This listener knows when you touch the screen (namely the map) and when you touch
+        // the screen, the vibrator is activated.
+        IMG.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                cursor.setAbscissa(event.getX());
+                cursor.setOrdinate(event.getY());
+                float X = event.getX();
+                float Y = event.getY();
+                Cursor(X, Y);
+                //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
+                Log.i("MainActivity", "La balise la plus proche est: " + list.min_distance(list));
+                list.min_distance(list);
+                vibs.vibrate(100);
+                return true;
+            }
+
+            //Change the map accordance with the altitude Z
+            /*public boolean ChangeMap(float Z){
+                if (Z == 0){
+                    Intent intent = new Intent(MainActivity.this, Map_Third_Floor_Activity.class);
+                    startActivity(intent);
+                    // don't forget to transmit data!
+                }
+                return true;
+            }*/
+
+            public boolean Cursor(float X, float Y) {
+                Cursor = (ImageView) findViewById(R.id.cursor);
+                Cursor.setX(X);
+                Cursor.setY(Y);
+                return true;
+            }
+        });
+
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.

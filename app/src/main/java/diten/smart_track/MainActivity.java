@@ -50,7 +50,6 @@ public class MainActivity extends ActionBarActivity {
         Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
         mHandler = new Handler();
 
-
         Beacon beacon1 = new Beacon("beacon1", 200, 150, 300, 220);
         Beacon beacon2 = new Beacon("beacon2", 100, 500, 220, 40);
         Beacon beacon3 = new Beacon("beacon3", 3, 256, 504, 223);

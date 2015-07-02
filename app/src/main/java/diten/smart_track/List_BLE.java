@@ -67,15 +67,16 @@ public class List_BLE {
     }
 
     //Cross the list of beacons and resend the address mac of the beacon which it RSSI is the smallest.
-    public String min_distance(List_BLE list_ble) {
-        float RRSI = get_RSSI_index(0);
-        String addr_mac = get_addr_mac_index(0);
-        for(int i = 1; i < list_ble.size_list(); i++){
+    public String min_distance() {
+        float RRSI = -256;
+        String addr_mac = "EMPTY";
+        for(int i = 0; i < list.size(); i++){
             if((RRSI < get_RSSI_index(i)) && (get_beacon(i).getDectected())) {
                 RRSI = get_RSSI_index(i);
                 addr_mac = get_addr_mac_index(i);
             }
         }
+
         return addr_mac;
     }
 
@@ -104,10 +105,10 @@ public class List_BLE {
             if(get_addr_mac_index(i).compareTo(addr_mac) == 0) {
                 (get_beacon(i)).setRSSI(RSSI);
                 (get_beacon(i)).setDetected(true);
-                Log.i("List_BLE", "beacon okey ma gueule "+ (get_beacon(i)).get_addr_mac());
+             //   Log.i("List_BLE", "beacon okey ma gueule "+ (get_beacon(i)).get_addr_mac());
             }
-            else
-                Log.i("List_BLE", "Impossible de trouver le beacon correspondant");
+            else{}
+             //   Log.i("List_BLE", "Impossible de trouver le beacon correspondant");
         }
     }
 }

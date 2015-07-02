@@ -71,5 +71,22 @@
         </HorizontalScrollView>
     </ScrollView>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/scrollView"
+        android:layout_centerHorizontal="true">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            android:id="@+id/Start"
+            android:background="#ffffd100"
+            android:clickable="true"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
 
 </RelativeLayout>

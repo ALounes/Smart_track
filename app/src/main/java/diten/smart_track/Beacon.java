@@ -40,14 +40,20 @@ public class Beacon {
 
     void setDetected(boolean detected) { this.detected = detected; }
 
-    String get_addr_mac(){ return addr_mac; }
-    int getRSSI(){ return RSSI; }
+    String get_addr_mac(){
+        return addr_mac;
+    }
+    int getRSSI(){
+        return RSSI;
+    }
     float getAbscissa(){
         return abscissa;
     }
     float getOrdinate(){
         return ordinate;
     }
-    float getAltitude() { return altitude; }
+    float getAltitude() {
+        return altitude;
+    }
     boolean getDectected(){ return detected;}
 }

@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
     Button start = null;
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 2000;
+    private static final long SCAN_PERIOD = 4000;
     Cursor cursor = null;
 
 
@@ -120,7 +120,7 @@ public class MainActivity extends Activity {
         }
 
       //  scanLeDevice(true);
-        timer_test = new MyTimer();
+        timer_test = new MyTimer(this);
         timer_test.RepetAction();
     }
 
@@ -141,8 +141,8 @@ public class MainActivity extends Activity {
                     float Y = event.getY();
                     Cursor(X, Y);
                     //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
-                    Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
-                    list.min_distance(list);
+                    //Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
+                    //list.min_distance();
                     //vibs.vibrate(100);
 
                     // mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -214,24 +214,23 @@ public class MainActivity extends Activity {
         scanLeDevice(false);
     }
 
-    private void scanLeDevice(final boolean enable) {
 
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+    public void scanLeDevice(final boolean enable) {
+
+        //list.min_distance();
+
+
+                    //Log.i("ScanLeDevice", "  DEBUT interieur ");
+                    mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    list.list_clear_dectection();
+                      Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
                     mBluetoothAdapter.startLeScan(mLeScanCallback);
-                }
-            }, SCAN_PERIOD);
-
+                    //Log.i("ScanLeDevice", "  DEBUT exterieur ");
     }
 
-
 /*
-// ATTENTIONNNNNNNNNNNNNNNNNNNNN !!!!
-// ne pas SUPPPRIIIIMMMMEERRRRRR !!!!
-
-    private void scanLeDevice(final boolean enable) {
+    public void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
@@ -247,9 +246,11 @@ public class MainActivity extends Activity {
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
         }
     }
     */
+
 
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -261,7 +262,8 @@ public class MainActivity extends Activity {
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(), device + " | " + rssi, Toast.LENGTH_SHORT).show();
-                            list.list_find_by_add(device.toString(),rssi);
+                            list.list_find_by_add(device.toString(), rssi);
+                            //Log.i("MainActivity", " c'est bon c'est bon");
                         }
                     });
                 }

@@ -12,20 +12,30 @@ import java.util.TimerTask;
  */
 public class MyTimer {
     Timer t;
-    final int time = 2;
+    final int time = 4000;
+    MainActivity myMain = null;
+
+    MyTimer(MainActivity main){
+        myMain = main;
+    }
 
     public void  RepetAction() {
         t = new Timer();
-        t.schedule(new BleScaning(), 0, time * 1000);
+        t.schedule(new BleScaning(myMain), 0, time );
     }
 
     class BleScaning extends TimerTask {
 
+        MainActivity myMain = null;
+
+        BleScaning(MainActivity main){
+            myMain = main;
+        }
 
         public void run()
         {
             Log.i("MyTimer", " TIMER TIMER TIMER TIMER §!!!!!!!!!!!!!!!!!!!!!");
-
+            myMain.scanLeDevice(true);
         }
     }
 }

@@ -40,6 +40,9 @@ public class MainActivity extends Activity {
     private static final long SCAN_PERIOD = 2000;
     Cursor cursor = null;
 
+
+    MyTimer timer_test = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +119,9 @@ public class MainActivity extends Activity {
             return;
         }
 
-        scanLeDevice(true);
+      //  scanLeDevice(true);
+        timer_test = new MyTimer();
+        timer_test.RepetAction();
     }
 
     public boolean Cursor(float X, float Y) {
@@ -209,12 +214,11 @@ public class MainActivity extends Activity {
         scanLeDevice(false);
     }
 
-    public void scanLeDevice(final boolean enable) {
+    private void scanLeDevice(final boolean enable) {
 
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     mBluetoothAdapter.startLeScan(mLeScanCallback);
                 }
@@ -263,7 +267,5 @@ public class MainActivity extends Activity {
                 }
             };
 
-    public void monlapin(){
-        Toast.makeText(getApplicationContext(), "testeur de LoL", Toast.LENGTH_SHORT).show();
-    }
+
 }

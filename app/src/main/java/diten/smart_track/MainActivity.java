@@ -209,7 +209,7 @@ public class MainActivity extends Activity {
         scanLeDevice(false);
     }
 
-    private void scanLeDevice(final boolean enable) {
+    public void scanLeDevice(final boolean enable) {
 
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -221,6 +221,7 @@ public class MainActivity extends Activity {
             }, SCAN_PERIOD);
 
     }
+
 
 /*
 // ATTENTIONNNNNNNNNNNNNNNNNNNNN !!!!

@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -32,10 +34,11 @@ public class MainActivity extends Activity {
     ImageView Beacon3;
     public static Vibrator vibs;
     List_BLE list = null;
+    Button start = null;
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 5000;
-
+    private static final long SCAN_PERIOD = 2000;
+    Cursor cursor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,9 @@ public class MainActivity extends Activity {
         Beacon beacon3 = new Beacon("beacon3", 0, 256, 504, 223);
         Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
 
-        final Cursor cursor = new Cursor();
+        cursor = new Cursor();
+        start = (Button)findViewById(R.id.Start);
+        start.setOnClickListener(StartListner);
 
         list = new List_BLE();
 
@@ -75,24 +80,8 @@ public class MainActivity extends Activity {
 
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
-        IMG.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                cursor.setAbscissa(event.getX());
-                cursor.setOrdinate(event.getY());
-                float X = event.getX();
-                float Y = event.getY();
-                Cursor(X, Y);
-                //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
-                Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
-                list.min_distance(list);
-                //vibs.vibrate(100);
+        IMG.setOnTouchListener(ImgTouch);
 
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
-
-                return true;
-            }
 
             //Change the map accordance with the altitude Z
             /*public boolean ChangeMap(float Z){
@@ -104,13 +93,7 @@ public class MainActivity extends Activity {
                 return true;
             }*/
 
-            public boolean Cursor(float X, float Y) {
-                Cursor = (ImageView) findViewById(R.id.cursor);
-                Cursor.setX(X);
-                Cursor.setY(Y);
-                return true;
-            }
-        });
+
 
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -135,6 +118,42 @@ public class MainActivity extends Activity {
 
         scanLeDevice(true);
     }
+
+    public boolean Cursor(float X, float Y) {
+        Cursor = (ImageView) findViewById(R.id.cursor);
+        Cursor.setX(X);
+        Cursor.setY(Y);
+        return true;
+    }
+
+    private View.OnTouchListener ImgTouch =
+            new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    cursor.setAbscissa(event.getX());
+                    cursor.setOrdinate(event.getY());
+                    float X = event.getX();
+                    float Y = event.getY();
+                    Cursor(X, Y);
+                    //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
+                    Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
+                    list.min_distance(list);
+                    //vibs.vibrate(100);
+
+                    // mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    //mBluetoothAdapter.startLeScan(mLeScanCallback);
+
+                    return true;
+                }
+            };
+
+    private View.OnClickListener StartListner =
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    scanLeDevice(true);
+                }
+            };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -191,6 +210,23 @@ public class MainActivity extends Activity {
     }
 
     private void scanLeDevice(final boolean enable) {
+
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    mBluetoothAdapter.startLeScan(mLeScanCallback);
+                }
+            }, SCAN_PERIOD);
+
+    }
+
+/*
+// ATTENTIONNNNNNNNNNNNNNNNNNNNN !!!!
+// ne pas SUPPPRIIIIMMMMEERRRRRR !!!!
+
+    private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
@@ -208,6 +244,7 @@ public class MainActivity extends Activity {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
     }
+    */
 
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =

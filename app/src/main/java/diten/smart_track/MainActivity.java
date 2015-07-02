@@ -51,9 +51,9 @@ public class MainActivity extends Activity {
         mHandler = new Handler();
 
         Beacon beacon1 = new Beacon("C2:CB:A5:BD:A2:86", 0, 150, 300, 220);
-        Beacon beacon2 = new Beacon("00:07:80:79:2D:A0", 0, 500, 220, 40);
-        Beacon beacon3 = new Beacon("beacon3", 0, 256, 504, 223);
-        Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
+        Beacon beacon2 = new Beacon("beacon2", 0, 500, 220, 40);
+        Beacon beacon3 = new Beacon("00:07:80:79:2D:A0", 30, 100, 0, 223);
+        Beacon beacon4 = new Beacon("beacon4", 0, 256, 50, 223);
 
         final Cursor cursor = new Cursor();
 
@@ -78,21 +78,19 @@ public class MainActivity extends Activity {
         IMG.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                cursor.setAbscissa(event.getX());
-                cursor.setOrdinate(event.getY());
-                float X = event.getX();
-                float Y = event.getY();
-                Cursor(X, Y);
                 //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
                 Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance(list));
-                list.min_distance(list);
                 //vibs.vibrate(100);
-
+                float X = list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance(list)));
+                float Y = list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance(list)));
+                Cursor(X-25, Y-25);
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                //nettoie la liste des detections
+                list.list_clear_dectection();
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
-
                 return true;
             }
+
 
             //Change the map accordance with the altitude Z
             /*public boolean ChangeMap(float Z){

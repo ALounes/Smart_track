@@ -79,6 +79,18 @@ public class List_BLE {
         return addr_mac;
     }
 
+    //Obtain the index of the beacon thanks to its mac adress
+    public int get_index_by_addr_mac(String addr_mac){
+        int index = 0;
+        for (int i = 0; i < list.size(); i++){
+            if (get_addr_mac_index(i).compareTo(addr_mac) == 0)
+                index = i;
+        }
+        if (index == 0)
+            Log.i("List_BLE", "Problem function get_index_by_adrr_mac");
+        return index;
+    }
+
     //Put attribute 'detected' to false for all beacons
     public void list_clear_dectection(){
         for (int i = 0; i < list.size(); i++){
@@ -86,7 +98,7 @@ public class List_BLE {
         }
     }
 
-    //Find the beacon thanks to its mac adress
+    //Find the beacon thanks to its mac adress and put the RSSI value to the good beacon
     public void list_find_by_add(String addr_mac, int RSSI){
         for (int i = 0; i < list.size(); i++){
             if(get_addr_mac_index(i).compareTo(addr_mac) == 0) {

@@ -223,8 +223,8 @@ public class MainActivity extends Activity {
                     //Log.i("ScanLeDevice", "  DEBUT interieur ");
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
                     list.list_clear_dectection();
-                      Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
                     mBluetoothAdapter.startLeScan(mLeScanCallback);
                     //Log.i("ScanLeDevice", "  DEBUT exterieur ");
     }

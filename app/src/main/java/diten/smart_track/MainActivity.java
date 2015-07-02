@@ -8,6 +8,10 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.os.Bundle;
@@ -20,16 +24,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity{
 
     private BluetoothAdapter mBluetoothAdapter;
-    private boolean mScanning ;
+    private boolean mScanning;
     private Handler mHandler;
-    ImageView IMG;
+    private SensorManager SensorManager;
+
+    ImageView Map;
     ImageView Cursor;
     ImageView Beacon1;
     ImageView Beacon2;
     ImageView Beacon3;
+    Sensor magnetometer;
+    Sensor accelerometer;
     public static Vibrator vibs;
     List_BLE list = null;
 
@@ -37,17 +45,53 @@ public class MainActivity extends Activity {
     private static final long SCAN_PERIOD = 5000;
 
 
+    final SensorEventListener SensorEventListener = new SensorEventListener() {
+        float[] accelerometerVector;
+        float[] magneticVector;
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerVector=event.values;
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magneticVector=event.values;
+            }
+            if (accelerometerVector != null && magneticVector != null) {
+                float R[] = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, null, accelerometerVector, magneticVector);
+                if (success) {
+                    float orientation[] = new float[3];
+                    SensorManager.getOrientation(R, orientation);
+                    //Log.i("MainActivity", "Le nord est à: " + (float) Math.toDegrees(orientation[0]));
+                    Map.setRotation((float)Math.toDegrees(orientation[0]));
+                    Beacon1.setRotation((float)Math.toDegrees(orientation[0]));
+                    Beacon2.setRotation((float)Math.toDegrees(orientation[0]));
+                    Beacon3.setRotation((float)Math.toDegrees(orientation[0]));
+                    Cursor.setRotation((float)Math.toDegrees(orientation[0]));
+                }
+            }
+
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        magnetometer = SensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        accelerometer = SensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         vibs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);   // The vibrator
-        Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
-        IMG = (ImageView) findViewById(R.id.imageView);
-        Beacon1 = (ImageView) findViewById(R.id.beacon1);       //The first beacon
-        Beacon2 = (ImageView) findViewById(R.id.beacon2);       //The second beacon
-        Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
+        Cursor = (ImageView) findViewById(R.id.cursor);                 // The red-point-cursor
+        Map = (ImageView) findViewById(R.id.carte);                     //The map
+        Beacon1 = (ImageView) findViewById(R.id.beacon1);               //The first beacon
+        Beacon2 = (ImageView) findViewById(R.id.beacon2);               //The second beacon
+        Beacon3 = (ImageView) findViewById(R.id.beacon3);               //The third beacon
         mHandler = new Handler();
 
         Beacon beacon1 = new Beacon("C2:CB:A5:BD:A2:86", 0, 150, 300, 220);
@@ -73,9 +117,10 @@ public class MainActivity extends Activity {
         Beacon3.setX(beacon3.getAbscissa());
         Beacon3.setY(beacon3.getOrdinate());
 
+
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
-        IMG.setOnTouchListener(new View.OnTouchListener() {
+        Map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
@@ -83,7 +128,7 @@ public class MainActivity extends Activity {
                 //vibs.vibrate(100);
                 float X = list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance(list)));
                 float Y = list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance(list)));
-                Cursor(X-25, Y-25);
+                Cursor(X - 25, Y - 25);
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
                 //nettoie la liste des detections
                 list.list_clear_dectection();
@@ -114,7 +159,7 @@ public class MainActivity extends Activity {
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this,"BLE NOT SUPPORTED", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "BLE NOT SUPPORTED", Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -168,7 +213,8 @@ public class MainActivity extends Activity {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-
+        SensorManager.registerListener(SensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        SensorManager.registerListener(SensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
         scanLeDevice(true);
     }
 
@@ -185,6 +231,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        SensorManager.unregisterListener(SensorEventListener, accelerometer);
+        SensorManager.unregisterListener(SensorEventListener, magnetometer);
         scanLeDevice(false);
     }
 
@@ -226,4 +274,5 @@ public class MainActivity extends Activity {
     public void monlapin(){
         Toast.makeText(getApplicationContext(), "testeur de LoL", Toast.LENGTH_SHORT).show();
     }
+
 }

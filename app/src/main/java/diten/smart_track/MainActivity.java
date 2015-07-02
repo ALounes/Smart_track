@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -39,9 +41,14 @@ public class MainActivity extends Activity {
     Sensor accelerometer;
     public static Vibrator vibs;
     List_BLE list = null;
+    Button start = null;
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 5000;
+    private static final long SCAN_PERIOD = 4000;
+    Cursor cursor = null;
+
+
+    MyTimer timer_test = null;
 
     final SensorEventListener SensorEventListener = new SensorEventListener() {
         float[] accelerometerVector;
@@ -61,19 +68,13 @@ public class MainActivity extends Activity {
                     SensorManager.getOrientation(R, orientation);
                     //Log.i("MainActivity", "Le nord est à: " + (float) Math.toDegrees(orientation[0]));
                     Map.setRotation((float)Math.toDegrees(orientation[0]));
-                    Beacon1.setRotation((float)Math.toDegrees(orientation[0]));
-                    Beacon2.setRotation((float)Math.toDegrees(orientation[0]));
-                    Beacon3.setRotation((float)Math.toDegrees(orientation[0]));
-                    Cursor.setRotation((float)Math.toDegrees(orientation[0]));
                 }
             }
 
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) { }
     };
 
     @Override
@@ -83,7 +84,6 @@ public class MainActivity extends Activity {
         SensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magnetometer = SensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         accelerometer = SensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
         vibs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);   // The vibrator
         Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
         Map = (ImageView) findViewById(R.id.carte);
@@ -97,7 +97,9 @@ public class MainActivity extends Activity {
         Beacon beacon3 = new Beacon("beacon3", 0, 256, 504, 223);
         Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
 
-        final Cursor cursor = new Cursor();
+        cursor = new Cursor();
+        start = (Button)findViewById(R.id.Start);
+        start.setOnClickListener(StartListner);
 
         list = new List_BLE();
 
@@ -117,20 +119,10 @@ public class MainActivity extends Activity {
 
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
-        Map.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //Log.i("MainActivity", " Abscissa: " + X + " Ordinate: " + Y);
-                Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
-                //vibs.vibrate(100);
-                float X = list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance()));
-                float Y = list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance()));
-                Cursor(X - 25, Y - 25);
+        Map.setOnTouchListener(ImgTouch);
 
-                return true;
-            }
 
-            //Change the map accordance with the altitude Z
+        //Change the map accordance with the altitude Z
             /*public boolean ChangeMap(float Z){
                 if (Z == 0){
                     Intent intent = new Intent(MainActivity.this, Map_Third_Floor_Activity.class);
@@ -140,13 +132,6 @@ public class MainActivity extends Activity {
                 return true;
             }*/
 
-            public boolean Cursor(float X, float Y) {
-                Cursor = (ImageView) findViewById(R.id.cursor);
-                Cursor.setX(X);
-                Cursor.setY(Y);
-                return true;
-            }
-        });
 
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -169,8 +154,38 @@ public class MainActivity extends Activity {
             return;
         }
 
-        scanLeDevice(true);
+        //  scanLeDevice(true);
+        timer_test = new MyTimer(this);
+        timer_test.RepetAction();
     }
+
+    public boolean Cursor(float X, float Y) {
+        Cursor = (ImageView) findViewById(R.id.cursor);
+        Cursor.setX(X);
+        Cursor.setY(Y);
+        return true;
+    }
+
+    private View.OnTouchListener ImgTouch =
+            new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    cursor.setAbscissa(event.getX());
+                    cursor.setOrdinate(event.getY());
+                    float X = list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance()));
+                    float Y = list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance()));
+                    Cursor(X - 25, Y - 25);
+                    return true;
+                }
+            };
+
+    private View.OnClickListener StartListner =
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    scanLeDevice(true);
+                }
+            };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,8 +209,8 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-        @Override
-        protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
@@ -206,9 +221,9 @@ public class MainActivity extends Activity {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-            SensorManager.registerListener(SensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-            SensorManager.registerListener(SensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
-            scanLeDevice(true);
+        SensorManager.registerListener(SensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        SensorManager.registerListener(SensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        scanLeDevice(true);
     }
 
     @Override
@@ -230,6 +245,21 @@ public class MainActivity extends Activity {
     }
 
     public void scanLeDevice(final boolean enable) {
+
+        //list.min_distance();
+
+
+        //Log.i("ScanLeDevice", "  DEBUT interieur ");
+        mScanning = false;
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
+        list.list_clear_dectection();
+        mBluetoothAdapter.startLeScan(mLeScanCallback);
+        //Log.i("ScanLeDevice", "  DEBUT exterieur ");
+    }
+
+/*
+    public void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
@@ -239,14 +269,16 @@ public class MainActivity extends Activity {
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                 }
             }, SCAN_PERIOD);
-
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
         }
     }
+    */
+
 
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -258,13 +290,12 @@ public class MainActivity extends Activity {
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(), device + " | " + rssi, Toast.LENGTH_SHORT).show();
-                            list.list_find_by_add(device.toString(),rssi);
+                            list.list_find_by_add(device.toString(), rssi);
+                            //Log.i("MainActivity", " c'est bon c'est bon");
                         }
                     });
                 }
             };
 
-    public void monlapin(){
-        Toast.makeText(getApplicationContext(), "testeur de LoL", Toast.LENGTH_SHORT).show();
-    }
+
 }

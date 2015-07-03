@@ -17,6 +17,10 @@ public class List_BLE {
         list.add(beacon);
     }
 
+    void create_beacon(String mac, int RSSI, float X, float Y, float Z){
+       add_beacon(new Beacon(mac,RSSI,X,Y,Z));
+    }
+
     void remove_beacon(Beacon beacon){
         list.remove(beacon);
     }

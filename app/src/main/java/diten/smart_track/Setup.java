@@ -15,6 +15,7 @@ public class Setup extends Activity {
     TextView asking = null;
     EditText field = null;
     Button validate = null;
+    List_BLE list = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,9 @@ public class Setup extends Activity {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    int i = 0;  //Compteur de Beacon
+                    id_beacon.setText("Beacon n° " + String.valueOf(i));
+                    list.create_beacon("02:L5:32:65", 45, 56, 54, 78);
                 }
             };
 }

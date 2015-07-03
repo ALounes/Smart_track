@@ -22,8 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
@@ -43,6 +41,8 @@ public class MainActivity extends Activity {
     public static Vibrator vibs;
     List_BLE list = null;
     Button start = null;
+    private float accuracy;
+    private float orientations;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 4000;
@@ -67,15 +67,20 @@ public class MainActivity extends Activity {
                 if (success) {
                     float orientation[] = new float[3];
                     SensorManager.getOrientation(R, orientation);
-                    //Log.i("MainActivity", "Le nord est à: " + (float) Math.toDegrees(orientation[0]));
-                    Map.setRotation((float)Math.toDegrees(orientation[0]));
+                    orientations = (float) Math.toDegrees(orientation[0]);
+                    if (Math.abs(orientations - accuracy) >= 5){
+                        accuracy = orientations;
+                        Map.setRotation(accuracy);
+                    }
+                    else
+                        accuracy = orientations;
                 }
             }
 
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     };
 
     @Override
@@ -181,7 +186,6 @@ public class MainActivity extends Activity {
                     //vibs.vibrate(100);
                     // mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     //mBluetoothAdapter.startLeScan(mLeScanCallback);
-
                     return true;
                 }
             };
@@ -247,7 +251,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        //Il manque des choses!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  => go to the Internet
+        SensorManager.unregisterListener(SensorEventListener, accelerometer);
+        SensorManager.unregisterListener(SensorEventListener, magnetometer);
         scanLeDevice(false);
     }
 

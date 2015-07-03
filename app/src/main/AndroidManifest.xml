@@ -25,7 +25,7 @@
         </activity>
 
         <activity android:name=".Setup"
-                  android:label="choix_becon">
+            android:label="choix_becon">
 
         </activity>
 

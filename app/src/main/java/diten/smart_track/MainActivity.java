@@ -22,10 +22,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
+
+    RelativeLayout MainLayout = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,15 +36,20 @@ public class MainActivity extends Activity {
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main);
 
-    }
-}
-    /*
-    private View.OnClickListener StartListner =
-            new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        MainLayout = (RelativeLayout)findViewById(R.id.MainLayout);
 
+        MainLayout.setOnTouchListener(StartListner);
+
+    }
+
+    private View.OnTouchListener StartListner =
+            new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    Intent setup = new Intent(MainActivity.this, Setup.class);
+                    startActivity(setup);
+                    return true;
                 }
             };
-
- */
+}

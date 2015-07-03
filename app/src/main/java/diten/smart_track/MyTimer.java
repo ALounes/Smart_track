@@ -12,7 +12,7 @@ import java.util.TimerTask;
  */
 public class MyTimer {
     Timer t;
-    final int time = 4000;
+    final int time = 2000;
     MainActivity myMain = null;
 
     MyTimer(MainActivity main){

@@ -76,6 +76,8 @@ public class List_BLE {
                 addr_mac = get_addr_mac_index(i);
             }
         }
+        Log.i("List_BLE", " plus proche " + addr_mac);
+        list_clear_dectection();
         return addr_mac;
     }
 

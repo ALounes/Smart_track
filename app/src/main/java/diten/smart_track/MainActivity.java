@@ -28,6 +28,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothManager bluetoothManager;
     private boolean mScanning ;
     private Handler mHandler;
     private SensorManager SensorManager;
@@ -76,7 +77,6 @@ public class MainActivity extends Activity {
                         accuracy = orientations;
                 }
             }
-
         }
 
         @Override
@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
         Beacon beacon3 = new Beacon("14:99:E2:05:79:D2", 0, 256, 504, 223);
         Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
 
-        final Cursor cursor = new Cursor();
+        Cursor cursor = new Cursor();
 
         start = (Button)findViewById(R.id.Start);
         start.setOnClickListener(StartListner);
@@ -152,7 +152,7 @@ public class MainActivity extends Activity {
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
-        final BluetoothManager bluetoothManager =
+        bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -181,8 +181,7 @@ public class MainActivity extends Activity {
             new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
-                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
+
                     //vibs.vibrate(100);
                     // mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     //mBluetoothAdapter.startLeScan(mLeScanCallback);
@@ -194,7 +193,7 @@ public class MainActivity extends Activity {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    scanLeDevice(true);
+
                 }
             };
 
@@ -259,12 +258,19 @@ public class MainActivity extends Activity {
     public void scanLeDevice(final boolean enable) {
         mScanning = false;
         mBluetoothAdapter.stopLeScan(mLeScanCallback);
-        //update_cursor();
-        list.list_clear_dectection();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String t = list.min_distance();
+                if (t.compareTo("EMPTY") != 0) {
+                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) - 25);
+                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) - 25);
+                }
+                }
+            });
         mBluetoothAdapter.startLeScan(mLeScanCallback);
     }
-
-    int semaphore = 0;
 
     /*public void update_cursor(){
         //RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);

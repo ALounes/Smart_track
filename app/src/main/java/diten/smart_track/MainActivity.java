@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -23,6 +22,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
@@ -90,14 +91,16 @@ public class MainActivity extends Activity {
         Beacon1 = (ImageView) findViewById(R.id.beacon1);       //The first beacon
         Beacon2 = (ImageView) findViewById(R.id.beacon2);       //The second beacon
         Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
+
         mHandler = new Handler();
 
         Beacon beacon1 = new Beacon("C2:CB:A5:BD:A2:86", 0, 150, 300, 220);
         Beacon beacon2 = new Beacon("00:07:80:79:2D:A0", 0, 500, 220, 40);
-        Beacon beacon3 = new Beacon("beacon3", 0, 256, 504, 223);
+        Beacon beacon3 = new Beacon("14:99:E2:05:79:D2", 0, 256, 504, 223);
         Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
 
-        cursor = new Cursor();
+        final Cursor cursor = new Cursor();
+
         start = (Button)findViewById(R.id.Start);
         start.setOnClickListener(StartListner);
 
@@ -119,8 +122,9 @@ public class MainActivity extends Activity {
 
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
-        Map.setOnTouchListener(ImgTouch);
 
+
+        Map.setOnTouchListener(ImgTouch);
 
         //Change the map accordance with the altitude Z
             /*public boolean ChangeMap(float Z){
@@ -159,22 +163,25 @@ public class MainActivity extends Activity {
         timer_test.RepetAction();
     }
 
-    public boolean Cursor(float X, float Y) {
-        Cursor = (ImageView) findViewById(R.id.cursor);
-        Cursor.setX(X);
-        Cursor.setY(Y);
-        return true;
-    }
+    /*public void update_cursor(){
+        cursor.setAbscissa(list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())));
+        cursor.setOrdinate(list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())));
+        Log.i("MainActivity", "Le curseur est à: " + cursor.getAbscissa() + "et: " + cursor.getOrdinate());
+        //Cursor.setX(cursor.getAbscissa());
+        //Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())));
+        //Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())));
+    }*/
 
     private View.OnTouchListener ImgTouch =
             new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    cursor.setAbscissa(event.getX());
-                    cursor.setOrdinate(event.getY());
-                    float X = list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance()));
-                    float Y = list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance()));
-                    Cursor(X - 25, Y - 25);
+                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
+                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
+                    //vibs.vibrate(100);
+                    // mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    //mBluetoothAdapter.startLeScan(mLeScanCallback);
+
                     return true;
                 }
             };
@@ -193,6 +200,7 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -239,24 +247,30 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        SensorManager.unregisterListener(SensorEventListener, accelerometer);
-        SensorManager.unregisterListener(SensorEventListener, magnetometer);
+        //Il manque des choses!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  => go to the Internet
         scanLeDevice(false);
     }
 
     public void scanLeDevice(final boolean enable) {
-
-        //list.min_distance();
-
-
-        //Log.i("ScanLeDevice", "  DEBUT interieur ");
         mScanning = false;
         mBluetoothAdapter.stopLeScan(mLeScanCallback);
-        Log.i("MainActivity", "La balise  la plus proche est: " + list.min_distance());
+        //update_cursor();
         list.list_clear_dectection();
         mBluetoothAdapter.startLeScan(mLeScanCallback);
-        //Log.i("ScanLeDevice", "  DEBUT exterieur ");
     }
+
+    int semaphore = 0;
+
+    /*public void update_cursor(){
+        //RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);
+        //Cursor.setLayoutParams(layoutParams);
+        //setContentView(R.layout.activity_main);
+        Cursor.setRight((int)list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
+        Cursor.setLeft((int)list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
+    }*/
+
+
+
 
 /*
     public void scanLeDevice(final boolean enable) {

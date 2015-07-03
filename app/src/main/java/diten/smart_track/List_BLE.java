@@ -76,20 +76,18 @@ public class List_BLE {
                 addr_mac = get_addr_mac_index(i);
             }
         }
-
         return addr_mac;
     }
 
     //Obtain the index of the beacon thanks to its mac adress
     public int get_index_by_addr_mac(String addr_mac){
-        int index = 0;
+        Log.i("List_BLE", "adr MAC" + (String)addr_mac);
         for (int i = 0; i < list.size(); i++){
             if (get_addr_mac_index(i).compareTo(addr_mac) == 0)
-                index = i;
+                return i;
         }
-        if (index == 0)
-            Log.i("List_BLE", "Problem function get_index_by_adrr_mac");
-        return index;
+        Log.i("List_BLE", "Problem function get_index_by_adrr_mac");
+        return 0;
     }
 
     //Put attribute 'detected' to false for all beacons

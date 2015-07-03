@@ -2,10 +2,13 @@ package diten.smart_track;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by matthieu on 03/07/15.
@@ -15,7 +18,9 @@ public class Setup extends Activity {
     TextView asking = null;
     EditText field = null;
     Button validate = null;
-    List_BLE list = null;
+    List_BLE list;
+
+    private int compteur = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,9 +38,9 @@ public class Setup extends Activity {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int i = 0;  //Compteur de Beacon
-                    id_beacon.setText("Beacon n° " + String.valueOf(i));
-                    list.create_beacon("02:L5:32:65", 45, 56, 54, 78);
+                    Toast.makeText(getApplicationContext(), "COUCOU", Toast.LENGTH_LONG).show();
+                    id_beacon.setText("Beacon numéro: " + String.valueOf(compteur) );
+                    compteur++;
                 }
             };
 }

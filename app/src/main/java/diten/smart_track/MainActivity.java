@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
     final SensorEventListener SensorEventListener = new SensorEventListener() {
         float[] accelerometerVector;
         float[] magneticVector;
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
                     orientations = (float) Math.toDegrees(orientation[0]);
                     if (Math.abs(orientations - accuracy) >= 5){
                         accuracy = orientations;
-                        Map.setRotation(accuracy);
+                        Cursor.setRotation(accuracy + 180);
                     }
                     else
                         accuracy = orientations;
@@ -264,24 +265,13 @@ public class MainActivity extends Activity {
             public void run() {
                 String t = list.min_distance();
                 if (t.compareTo("EMPTY") != 0) {
-                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) - 25);
-                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) - 25);
+                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) - 150);  //Mettre un DEFINE
+                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) - 160);
                 }
                 }
             });
         mBluetoothAdapter.startLeScan(mLeScanCallback);
     }
-
-    /*public void update_cursor(){
-        //RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);
-        //Cursor.setLayoutParams(layoutParams);
-        //setContentView(R.layout.activity_main);
-        Cursor.setRight((int)list.get_abscissa_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
-        Cursor.setLeft((int)list.get_ordinate_index(list.get_index_by_addr_mac(list.min_distance())) - 25);
-    }*/
-
-
-
 
 /*
     public void scanLeDevice(final boolean enable) {

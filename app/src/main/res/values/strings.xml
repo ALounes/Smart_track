@@ -3,5 +3,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+
+    <string name="welcome_title">Smart Track</string>
+    <string name="welcome_annexe">Cosmic Lab Genova University</string>
 </resources>
 

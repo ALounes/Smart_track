@@ -75,7 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Mon Action"
-        android:id="@+id/button"
+        android:id="@+id/Start"
         android:background="#ff6eb0ff"
         android:clickable="true"
         android:layout_gravity="center_horizontal"

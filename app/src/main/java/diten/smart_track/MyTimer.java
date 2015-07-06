@@ -13,23 +13,23 @@ import java.util.TimerTask;
 public class MyTimer {
     Timer t;
     final int time = 2000;
-    MainActivity myMain = null;
+    Map myMap= null;
 
-    MyTimer(MainActivity main){
-        myMain = main;
+    MyTimer(Map map){
+        myMap = map;
     }
 
     public void  RepetAction() {
         t = new Timer();
-        t.schedule(new BleScaning(myMain), 0, time );
+        t.schedule(new BleScaning(myMap), 0, time );
     }
 
     class BleScaning extends TimerTask {
 
-        MainActivity myMain = null;
+        Map myMap = null;
 
-        BleScaning(MainActivity main){
-            myMain = main;
+        BleScaning(Map map){
+            myMap = map;
         }
 
         public void run()

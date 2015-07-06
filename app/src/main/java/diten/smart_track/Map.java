@@ -50,7 +50,7 @@ public class Map extends Activity {
     Cursor cursor = null;
 
 
-    MyTimer timer_test = null;
+    MyTimer myTimer = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,32 +69,12 @@ public class Map extends Activity {
         Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
 
         mHandler = new Handler();
-
-        Beacon beacon1 = new Beacon("C2:CB:A5:BD:A2:86", 0, 150, 300, 220);
-        Beacon beacon2 = new Beacon("00:07:80:79:2D:A0", 0, 500, 220, 40);
-        Beacon beacon3 = new Beacon("14:99:E2:05:79:D2", 0, 256, 504, 223);
-        Beacon beacon4 = new Beacon("beacon4", 0, 256, 504, 223);
-
         Cursor cursor = new Cursor();
-
         start = (Button)findViewById(R.id.Start);
         start.setOnClickListener(StartListner);
 
         list = new List_BLE();
-
-        list.add_beacon(beacon1);
-        list.add_beacon(beacon2);
-        list.add_beacon(beacon3);
-        list.add_beacon(beacon4);
-
-        //list.print_list();
-
-        Beacon1.setX(beacon1.getAbscissa());
-        Beacon1.setY(beacon1.getOrdinate());
-        Beacon2.setX(beacon2.getAbscissa());
-        Beacon2.setY(beacon2.getOrdinate());
-        Beacon3.setX(beacon3.getAbscissa());
-        Beacon3.setY(beacon3.getOrdinate());
+        myTimer = new MyTimer(this);
 
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
@@ -121,9 +101,7 @@ public class Map extends Activity {
             return;
         }
 
-        //  scanLeDevice(true);
-        timer_test = new MyTimer(this);
-        timer_test.RepetAction();
+        myTimer.RepetAction();
 
     }
     /**********************************************************************************************/
@@ -165,10 +143,6 @@ public class Map extends Activity {
             new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-
-                    //vibs.vibrate(100);
-                    // mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    //mBluetoothAdapter.startLeScan(mLeScanCallback);
                     return true;
                 }
             };
@@ -177,7 +151,6 @@ public class Map extends Activity {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                 }
             };
 

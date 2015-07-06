@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.support.annotation.DrawableRes;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,9 +35,6 @@ public class Map extends Activity {
     private SensorManager SensorManager;
     ImageView Map;
     ImageView Cursor;
-    ImageView Beacon1;
-    ImageView Beacon2;
-    ImageView Beacon3;
     Sensor magnetometer;
     Sensor accelerometer;
     public static Vibrator vibs;
@@ -64,9 +62,7 @@ public class Map extends Activity {
         vibs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);   // The vibrator
         Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
         Map = (ImageView) findViewById(R.id.carte);
-        Beacon1 = (ImageView) findViewById(R.id.beacon1);       //The first beacon
-        Beacon2 = (ImageView) findViewById(R.id.beacon2);       //The second beacon
-        Beacon3 = (ImageView) findViewById(R.id.beacon3);       //The third beacon
+
 
         mHandler = new Handler();
         Cursor cursor = new Cursor();
@@ -127,7 +123,7 @@ public class Map extends Activity {
                     orientations = (float) Math.toDegrees(orientation[0]);
                     if (Math.abs(orientations - accuracy) >= 5){
                         accuracy = orientations;
-                        Map.setRotation(accuracy);
+                        Cursor.setRotation(accuracy);
                     }
                     else
                         accuracy = orientations;

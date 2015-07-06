@@ -35,7 +35,7 @@ public class MyTimer {
         public void run()
         {
             Log.i("MyTimer", " TIMER TIMER TIMER TIMER §!!!!!!!!!!!!!!!!!!!!!");
-            //myMain.scanLeDevice(true);
+            myMap.scanLeDevice(true);
         }
     }
 }

@@ -26,7 +26,10 @@
 
         <activity android:name=".Setup"
             android:label="choix_becon">
+        </activity>
 
+        <activity android:name=".Map"
+            android:label="choix_becon">
         </activity>
 
     </application>

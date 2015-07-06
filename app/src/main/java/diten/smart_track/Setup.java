@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +20,8 @@ public class Setup extends Activity {
     Button validate = null;
     List_BLE list;
 
-    private int counter = 0;
-    private int step = 0;
+    private int counter = 1;
+    private int step = 3;
     private String addr_mac = null;
     private int X = 0;
     private int Y = 0;
@@ -69,52 +68,54 @@ public class Setup extends Activity {
                     if (counter == 0){
                         String counterS = field.getText().toString();
                         counter = Integer.parseInt(counterS);
-                        asking.setText("Veuillez entrer l'adresse MAC: ");
+                        //asking.setText("Enter the mac adress: ");
+                        asking.setText("Enter the position x: ");
                         Toast.makeText(getApplicationContext(), "Ok, le nombre de Beacon est " + counter, Toast.LENGTH_LONG).show();
                     }
                     else{
                         switch (step) {
                             case 0:
                                 addr_mac = field.getText().toString();
-                                asking.setText("Veuillez entrer la position x: ");
+                                asking.setText("Enter the position x: ");
                                 step = 1;
                                 break;
                             case 1:
                                 String x = field.getText().toString();
                                 X = Integer.parseInt(x);
-                                asking.setText("Veuillez entrer la position y: ");
+                                asking.setText("Enter the position y: ");
                                 step = 2;
                                 break;
                             case 2:
                                 String y = field.getText().toString();
                                 Y = Integer.parseInt(y);
-                                asking.setText("Veuillez entrer l'étage: ");
+                                asking.setText("Enter the floor: ");
                                 step = 3;
                                 break;
                             case 3:
                                 String floor = field.getText().toString();
                                 Floor = Integer.parseInt(floor);
                                 counter--;
-                                list.create_beacon(addr_mac, 0, X, Y, Floor);
+                                list.create_beacon("C2:CB:A5:BD:A2:86", 0, 20, 40, Floor);
+                                list.create_beacon("00:07:80:79:2D:A0", 0, 40, 60, Floor);
                                 if (counter == 0){
                                     Intent setup = new Intent(Setup.this, Map.class);
                                     startActivity(setup);
                                 }
                                 else {
-                                    asking.setText("Veuillez entrer l'adresse MAC: ");      //Ajouter une condition
-                                    Toast.makeText(getApplicationContext(), "Nouveau Beacon crée. Addr MAC: " + addr_mac + " X: " + X + " Y: " + Y + " Floor: " + Floor, Toast.LENGTH_LONG).show();
+                                    //asking.setText("Enter the mac adress: ");      //Ajouter une condition
+                                    asking.setText("Enter the position x: ");
+                                    Toast.makeText(getApplicationContext(), "Nouveau Beacon crée. " + " X: " + X + " Y: " + Y + " Floor: " + Floor, Toast.LENGTH_LONG).show();
                                     list.print_list();
-                                    step = 0;
+                                    step = 1;
                                 }
                                 break;
                             default:
-                                asking.setText("ERREUR, veuillez recommencer la configuration de la balise");
+                                asking.setText("ERROR, please restart the beacon configuration");
                                 step = 0;
                                 break;
                         }
-                        //Toast.makeText(getApplicationContext(), "COUCOU", Toast.LENGTH_LONG).show();
                     }
-                    id_beacon.setText("Beacon numéro: " + String.valueOf(counter));
+                    id_beacon.setText("Beacon number: " + String.valueOf(counter));
                 }
             };
 }

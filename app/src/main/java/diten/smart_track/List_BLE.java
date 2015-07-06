@@ -1,6 +1,7 @@
 package diten.smart_track;
 
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class List_BLE {
 
     void create_beacon(String mac, int RSSI, float X, float Y, float Z){
        add_beacon(new Beacon(mac,RSSI,X,Y,Z));
+
     }
 
     void remove_beacon(Beacon beacon){

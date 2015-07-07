@@ -1,5 +1,7 @@
 package diten.smart_track;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,12 +12,76 @@ import java.util.ArrayList;
 /**
  * Created by matthieu on 26/06/15.
  */
-public class List_BLE {
+public class List_BLE extends ArrayList<Beacon> implements Parcelable {
 
-    ArrayList list = new ArrayList<Beacon>();
+    public List_BLE()
+    {
+
+    }
+
+    public List_BLE(Parcel in)
+    {
+        this.getFromParcel(in);
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
+    {
+        public List_BLE createFromParcel(Parcel in)
+        {
+            return new List_BLE(in);
+        }
+
+        @Override
+        public Object[] newArray(int size) {
+            return null;
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        //Taille de la liste
+        int size = this.size();
+        dest.writeInt(size);
+
+        for(int i=0; i < size; i++)
+        {
+            Beacon beacon = this.get(i); //On vient lire chaque objet personne
+            dest.writeParcelable(beacon, flags);
+        }
+    }
+
+    public void getFromParcel(Parcel in)
+    {
+        // On vide la liste avant tout remplissage
+        this.clear();
+
+        //Récupération du nombre d'objet
+        int size = in.readInt();
+
+        //On repeuple la liste avec de nouveau objet
+        for(int i = 0; i < size; i++)
+        {
+            Beacon beacon = in.readParcelable(Beacon.class.getClassLoader());
+            this.add(beacon);
+        }
+
+    }
+
+    /*******************************************************************************/
+    /*******************************************************************************/
+    /*******************************************************************************/
+
+    //ArrayList list = new ArrayList<Beacon>();
 
     void add_beacon(Beacon beacon){
-        list.add(beacon);
+        this.add(beacon);
     }
 
     void create_beacon(String mac, int RSSI, float X, float Y, float Z){
@@ -24,51 +90,51 @@ public class List_BLE {
     }
 
     void remove_beacon(Beacon beacon){
-        list.remove(beacon);
+        this.remove(beacon);
     }
 
     int size_list(){
-        return list.size();
+        return this.size();
     }
 
     Beacon get_beacon(int index){
-        return (Beacon)list.get(index);
+        return (Beacon)this.get(index);
     }
 
     String get_addr_mac_index(int i){
-        String addr_mac = ((Beacon)(list.get(i))).get_addr_mac();
+        String addr_mac = ((Beacon)(this.get(i))).get_addr_mac();
         return addr_mac;
     }
 
     float get_abscissa_index(int i){
-        float abscissa = ((Beacon)(list.get(i))).getAbscissa();
+        float abscissa = ((Beacon)(this.get(i))).getAbscissa();
         return abscissa;
     }
 
     float get_ordinate_index(int i){
-        float ordinate = ((Beacon)(list.get(i))).getOrdinate();
+        float ordinate = ((Beacon)(this.get(i))).getOrdinate();
         return ordinate;
     }
 
     float get_altitude_index(int i) {
-        float altitude = ((Beacon) (list.get(i))).getAltitude();
+        float altitude = ((Beacon) (this.get(i))).getAltitude();
         return altitude;
     }
 
     boolean get_detected_index(int i) {
-        boolean detected = ((Beacon) (list.get(i))).getDectected();
+        boolean detected = ((Beacon) (this.get(i))).getDectected();
         return detected;
     }
 
     float get_RSSI_index(int i) {
-        float RSSI = ((Beacon) (list.get(i))).getRSSI();
+        float RSSI = ((Beacon) (this.get(i))).getRSSI();
         return RSSI;
     }
 
     void print_list(){
-        for(int i = 0; i < list.size(); i++){
-            Log.i("List_BLE", " ABSCISSE: " + ((Beacon)(list.get(i))).getAbscissa() + " ORDONNNEE: " + ((Beacon)(list.get(i))).getOrdinate() + "ALTITUDE: " + ((Beacon)(list.get(i))).getAltitude() );
-            Log.i("List_BLE", " RSSI: " + ((Beacon) (list.get(i))).getRSSI() + " ADDR MAC: " + ((Beacon) (list.get(i))).get_addr_mac());
+        for(int i = 0; i < this.size(); i++){
+            Log.i("List_BLE", " ABSCISSE: " + ((Beacon)(this.get(i))).getAbscissa() + " ORDONNNEE: " + ((Beacon)(this.get(i))).getOrdinate() + "ALTITUDE: " + ((Beacon)(this.get(i))).getAltitude() );
+            Log.i("List_BLE", " RSSI: " + ((Beacon) (this.get(i))).getRSSI() + " ADDR MAC: " + ((Beacon) (this.get(i))).get_addr_mac());
         }
     }
 
@@ -76,7 +142,7 @@ public class List_BLE {
     public String min_distance() {
         float RRSI = -256;
         String addr_mac = "EMPTY";
-        for(int i = 0; i < list.size(); i++){
+        for(int i = 0; i < this.size(); i++){
             if((RRSI < get_RSSI_index(i)) && (get_beacon(i).getDectected())) {
                 RRSI = get_RSSI_index(i);
                 addr_mac = get_addr_mac_index(i);
@@ -90,7 +156,7 @@ public class List_BLE {
     //Obtain the index of the beacon thanks to its mac adress
     public int get_index_by_addr_mac(String addr_mac){
         Log.i("List_BLE", "adr MAC" + (String)addr_mac);
-        for (int i = 0; i < list.size(); i++){
+        for (int i = 0; i < this.size(); i++){
             if (get_addr_mac_index(i).compareTo(addr_mac) == 0)
                 return i;
         }
@@ -100,14 +166,14 @@ public class List_BLE {
 
     //Put attribute 'detected' to false for all beacons
     public void list_clear_dectection(){
-        for (int i = 0; i < list.size(); i++){
+        for (int i = 0; i < this.size(); i++){
             (get_beacon(i)).setDetected(false);
         }
     }
 
     //Find the beacon thanks to its mac adress and put the RSSI value to the good beacon
     public void list_find_by_add(String addr_mac, int RSSI){
-        for (int i = 0; i < list.size(); i++){
+        for (int i = 0; i < this.size(); i++){
             if(get_addr_mac_index(i).compareTo(addr_mac) == 0) {
                 (get_beacon(i)).setRSSI(RSSI);
                 (get_beacon(i)).setDetected(true);

@@ -3,6 +3,7 @@ package diten.smart_track;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,26 +41,6 @@ public class Setup extends Activity {
 
         //field.setOnEditorActionListener(StartListner2);
     }
-
-    /*Structure du fichier:Il faut un écouteur sur le bouton valider. Ce bouton est l'élement le plus important de la classe Setup. Grâce à ce bouton,
-    * on peut avancer dans les étapes. Un compteur de type private permet de savoir le nombre de beacon à configurer, il faut l'incrémenter à chaque fois que
-    * toutes les informations nécessaires ont été insérées.
-    * Dès qu'on clique sur le bouton valider, on récupère ce qu'il y a dans le champ EditText. S'il n'y a rien, on ne fait rien. S'il y a un nombre,
-    * on le stocke dans une variable.
-    * Enfin, lorsque toutes les informations ont été données, on crée un Beacon avec ttes les données en paramètre puis on l'ajoute à la liste des
-    * beacons.
-    * Enfin lorsque nous arrivons à la fin du compteur, on fait un Toast pour dire que c'est la fin puis on passe à la map.
-    * Sur la map, on place les balises au bon endroit!*/
-
-    /*Explication algorithmique passage des différents résultats:
-    A chaque fois qu'on clique sur le bouton Validé, on change d'étape:
-    -> Il y a 4 étapes:
-    Etape 0: adresse MAC insérer une adresse mac et gérer un type d'érreur (genre format erreur). On incrémente la variable si tout va bien.
-    Etape 1; position x!
-    Etape2 : position y!
-    Etape 3: numéro de l'étage!
-    Etape ERREUR; faire quelque chose si jamais il y a une erreur!!!
-     */
 
     private View.OnClickListener StartListner =
             new View.OnClickListener() {
@@ -99,6 +80,7 @@ public class Setup extends Activity {
                                 list.create_beacon("00:07:80:79:2D:A0", 0, 40, 60, Floor);
                                 if (counter == 0){
                                     Intent setup = new Intent(Setup.this, Map.class);
+                                    setup.putExtra("list_ble", (Parcelable)list);
                                     startActivity(setup);
                                 }
                                 else {

@@ -15,12 +15,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.DrawableRes;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 /**
@@ -42,6 +44,7 @@ public class Map extends Activity {
     Button start = null;
     private float accuracy;
     private float orientations;
+    RelativeLayout relativeLayout = null;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 4000;
@@ -53,8 +56,13 @@ public class Map extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.map);
+        View view =getLayoutInflater().inflate(R.layout.map,null); // get reference to root activity view
+        setContentView(view);
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relative_layout5);
 
+        Intent setup = getIntent();
+        list = setup.getExtras().getParcelable("list_ble");
+        //View view = (View) findViewById(R.id.relative_layout);
 
         SensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magnetometer = SensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -63,19 +71,33 @@ public class Map extends Activity {
         Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
         Map = (ImageView) findViewById(R.id.carte);
 
+        Map.setOnClickListener(StartListner);
 
         mHandler = new Handler();
         Cursor cursor = new Cursor();
         start = (Button)findViewById(R.id.Start);
         start.setOnClickListener(StartListner);
 
-        list = new List_BLE();
+        //list = new List_BLE();
+        //list.create_beacon("C2:CB:A5:BD:A2:86", 0, 200, 400, 0);
+        //list.create_beacon("00:07:80:79:2D:A0", 0, 400, 600, 0);
         myTimer = new MyTimer(this);
+
 
         // This listener knows when you touch the screen (namely the map) and when you touch
         // the screen, the vibrator is activated.
 
         Map.setOnTouchListener(ImgTouch);
+
+        Log.i("Map", "La taille de la liste est de: " + list.size_list());
+
+        for (int i = 0; i < list.size_list(); i++){
+            ImageView beacons = new ImageView(this);
+            beacons.setBackgroundResource(R.drawable.blue_point);
+            beacons.setX(list.get_abscissa_index(i));
+            beacons.setY(list.get_ordinate_index(i));
+            relativeLayout.addView(beacons);
+        }
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
@@ -145,8 +167,20 @@ public class Map extends Activity {
 
     private View.OnClickListener StartListner =
             new View.OnClickListener() {
+                boolean zoomedOut = false;
+
                 @Override
                 public void onClick(View v) {
+                    if (zoomedOut){
+                        v.setScaleX(1);
+                        v.setScaleY(1);
+                        zoomedOut = false;
+                    }
+                    else{
+                        v.setScaleX(2f);
+                        v.setScaleY(2f);
+                        zoomedOut = true;
+                    }
                 }
             };
 
@@ -225,8 +259,8 @@ public class Map extends Activity {
             public void run() {
                 String t = list.min_distance();
                 if (t.compareTo("EMPTY") != 0) {
-                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) - 25);
-                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) - 25);
+                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) -180);   //Transformer en Constante globale
+                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) -180);
                 }
             }
         });

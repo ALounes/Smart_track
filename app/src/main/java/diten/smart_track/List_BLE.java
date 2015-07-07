@@ -3,6 +3,7 @@ package diten.smart_track;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +87,6 @@ public class List_BLE extends ArrayList<Beacon> implements Parcelable {
 
     void create_beacon(String mac, int RSSI, float X, float Y, float Z){
        add_beacon(new Beacon(mac,RSSI,X,Y,Z));
-
     }
 
     void remove_beacon(Beacon beacon){

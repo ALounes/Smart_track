@@ -20,6 +20,7 @@ public class Setup extends Activity {
     EditText field = null;
     Button validate = null;
     List_BLE list;
+    Beacon beacon;
 
     private int counter = 1;
     private int step = 3;
@@ -27,6 +28,8 @@ public class Setup extends Activity {
     private int X = 0;
     private int Y = 0;
     private int Floor = 0;
+
+    final String EXTRA_LIST = "list_ble";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class Setup extends Activity {
         asking = (TextView) findViewById(R.id.asking);
         validate.setOnClickListener(StartListner);
         list = new List_BLE();
+        beacon = new Beacon("coucou", 0, 10, 10, 10);
 
         //field.setOnEditorActionListener(StartListner2);
     }
@@ -80,8 +84,10 @@ public class Setup extends Activity {
                                 list.create_beacon("00:07:80:79:2D:A0", 0, 40, 60, Floor);
                                 if (counter == 0){
                                     Intent setup = new Intent(Setup.this, Map.class);
-                                    setup.putExtra("list_ble", (Parcelable)list);
+                                    //setup.putExtra(EXTRA_LIST, beacon);
+                                    //Log.i("Setup", "Avant");
                                     startActivity(setup);
+                                    Log.i("Setup", "Après");
                                 }
                                 else {
                                     //asking.setText("Enter the mac adress: ");      //Ajouter une condition

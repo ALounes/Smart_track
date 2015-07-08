@@ -40,7 +40,8 @@ public class Map extends Activity {
     Sensor magnetometer;
     Sensor accelerometer;
     public static Vibrator vibs;
-    List_BLE list = null;
+    List_BLE list;
+    Beacon beacon;
     Button start = null;
     private float accuracy;
     private float orientations;
@@ -55,14 +56,17 @@ public class Map extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i("Setup", "Après2");
         super.onCreate(savedInstanceState);
         View view =getLayoutInflater().inflate(R.layout.map,null); // get reference to root activity view
         setContentView(view);
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relative_layout5);
 
-        Intent setup = getIntent();
-        list = setup.getExtras().getParcelable("list_ble");
-        //View view = (View) findViewById(R.id.relative_layout);
+
+        //Intent setup = getIntent();
+        //Log.i("Setup", "Après3");
+        //beacon = setup.getBundleExtra("list_ble");
+        Log.i("Setup", "Après4");
 
         SensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magnetometer = SensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -71,16 +75,14 @@ public class Map extends Activity {
         Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
         Map = (ImageView) findViewById(R.id.carte);
 
-        Map.setOnClickListener(StartListner);
-
-        mHandler = new Handler();
+        //mHandler = new Handler();
         Cursor cursor = new Cursor();
         start = (Button)findViewById(R.id.Start);
         start.setOnClickListener(StartListner);
 
-        //list = new List_BLE();
-        //list.create_beacon("C2:CB:A5:BD:A2:86", 0, 200, 400, 0);
-        //list.create_beacon("00:07:80:79:2D:A0", 0, 400, 600, 0);
+        list = new List_BLE();
+        list.create_beacon("C2:CB:A5:BD:A2:86", 0, 200, 400, 0);
+        list.create_beacon("00:07:80:79:2D:A0", 0, 400, 600, 0);
         myTimer = new MyTimer(this);
 
 
@@ -167,20 +169,10 @@ public class Map extends Activity {
 
     private View.OnClickListener StartListner =
             new View.OnClickListener() {
-                boolean zoomedOut = false;
 
                 @Override
                 public void onClick(View v) {
-                    if (zoomedOut){
-                        v.setScaleX(1);
-                        v.setScaleY(1);
-                        zoomedOut = false;
-                    }
-                    else{
-                        v.setScaleX(2f);
-                        v.setScaleY(2f);
-                        zoomedOut = true;
-                    }
+
                 }
             };
 

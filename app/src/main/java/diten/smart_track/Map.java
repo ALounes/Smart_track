@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.DrawableRes;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,146 +31,62 @@ import android.widget.Toast;
  */
 public class Map extends Activity {
 
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothManager bluetoothManager;
-    private boolean mScanning ;
-    private Handler mHandler;
-    private SensorManager SensorManager;
-    ImageView Map;
+    private   BluetoothAdapter mBluetoothAdapter;
+    private   BluetoothManager bluetoothManager;
+    private   static final int REQUEST_ENABLE_BT = 1;
+    private   static final long SCAN_PERIOD = 4000;
+    private   boolean mScanning ;
+    private   Handler mHandler;
+    MyTimer   myTimer1 = null;
+    MyTimer2  myTimer2 = null;
+    List_BLE  list     = null;
+    Cursor    cursor   = null;
+    Button    start    = null;
     ImageView Cursor;
-    Sensor magnetometer;
-    Sensor accelerometer;
-    public static Vibrator vibs;
-    List_BLE list;
-    Beacon beacon;
-    Button start = null;
-    private float accuracy;
-    private float orientations;
-    RelativeLayout relativeLayout = null;
-
-    private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 4000;
-    Cursor cursor = null;
-
-
-    MyTimer myTimer = null;
+    ImageView Map;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i("Setup", "Après2");
         super.onCreate(savedInstanceState);
         View view =getLayoutInflater().inflate(R.layout.map,null); // get reference to root activity view
         setContentView(view);
-        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relative_layout5);
 
-
-        //Intent setup = getIntent();
-        //Log.i("Setup", "Après3");
-        //beacon = setup.getBundleExtra("list_ble");
-        Log.i("Setup", "Après4");
-
-        SensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        magnetometer = SensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        accelerometer = SensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        vibs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);   // The vibrator
-        Cursor = (ImageView) findViewById(R.id.cursor);     // The red-point-cursor
+        start = (Button) findViewById(R.id.Start);
         Map = (ImageView) findViewById(R.id.carte);
 
-        //mHandler = new Handler();
-        Cursor cursor = new Cursor();
-        start = (Button)findViewById(R.id.Start);
-        start.setOnClickListener(StartListner);
-
+        myTimer1 = new MyTimer(this);
+        myTimer2 = new MyTimer2(this);
         list = new List_BLE();
-        list.create_beacon("C2:CB:A5:BD:A2:86", 0, 200, 400, 0);
-        list.create_beacon("00:07:80:79:2D:A0", 0, 400, 600, 0);
-        myTimer = new MyTimer(this);
 
+        Cursor cursor = new Cursor();
 
-        // This listener knows when you touch the screen (namely the map) and when you touch
-        // the screen, the vibrator is activated.
+        // initialisation statique voir la class List_BLE
+        list.list_static_initialisation();
 
-        Map.setOnTouchListener(ImgTouch);
+        BLE_management();
 
-        Log.i("Map", "La taille de la liste est de: " + list.size_list());
-
-        for (int i = 0; i < list.size_list(); i++){
-            ImageView beacons = new ImageView(this);
-            beacons.setBackgroundResource(R.drawable.blue_point);
-            beacons.setX(list.get_abscissa_index(i));
-            beacons.setY(list.get_ordinate_index(i));
-            relativeLayout.addView(beacons);
-        }
-
-        // Use this check to determine whether BLE is supported on the device.  Then you can
-        // selectively disable BLE-related features.
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this,"BLE NOT SUPPORTED", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
-        bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, "Bluetooth Not Supported", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        myTimer.RepetAction();
+        myTimer2.RepetAction();
+        myTimer1.RepetAction();
 
     }
+
+
+
+
     /**********************************************************************************************/
     /***************************** FONCTION DE GESTION DES LISTNER ********************************/
     /**********************************************************************************************/
 
-    final SensorEventListener SensorEventListener = new SensorEventListener() {
-        float[] accelerometerVector;
-        float[] magneticVector;
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                accelerometerVector=event.values;
-            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                magneticVector=event.values;
-            }
-            if (accelerometerVector != null && magneticVector != null) {
-                float R[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(R, null, accelerometerVector, magneticVector);
-                if (success) {
-                    float orientation[] = new float[3];
-                    SensorManager.getOrientation(R, orientation);
-                    orientations = (float) Math.toDegrees(orientation[0]);
-                    if (Math.abs(orientations - accuracy) >= 5){
-                        accuracy = orientations;
-                        Cursor.setRotation(accuracy);
-                    }
-                    else
-                        accuracy = orientations;
-                }
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-    };
-
-    private View.OnTouchListener ImgTouch =
-            new View.OnTouchListener() {
+    private View.OnClickListener listner_01 =
+            new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return true;
+                public void onClick(View v) {
+
                 }
             };
 
-    private View.OnClickListener StartListner =
+    private View.OnClickListener listner_02 =
             new View.OnClickListener() {
-
                 @Override
                 public void onClick(View v) {
 
@@ -214,8 +131,6 @@ public class Map extends Activity {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-        SensorManager.registerListener(SensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        SensorManager.registerListener(SensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
         scanLeDevice(true);
     }
 
@@ -232,8 +147,6 @@ public class Map extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        SensorManager.unregisterListener(SensorEventListener, accelerometer);
-        SensorManager.unregisterListener(SensorEventListener, magnetometer);
         scanLeDevice(false);
     }
 
@@ -242,21 +155,46 @@ public class Map extends Activity {
     /******************************* fONCTION DE GESTION DU BLE ***********************************/
     /**********************************************************************************************/
 
-    public void scanLeDevice(final boolean enable) {
-        mScanning = false;
-        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    private void BLE_management()
+    {
+        // Use this check to determine whether BLE is supported on the device.  Then you can
+        // selectively disable BLE-related features.
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this,"BLE NOT SUPPORTED", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
+        // BluetoothAdapter through BluetoothManager.
+        bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String t = list.min_distance();
-                if (t.compareTo("EMPTY") != 0) {
-                    Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) -180);   //Transformer en Constante globale
-                    Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) -180);
+        // Checks if Bluetooth is supported on the device.
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth Not Supported", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+    }
+
+    public void scanLeDevice(final boolean enable)
+    {
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        if (enable) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    /*
+                    String t = list.min_distance();
+                    if (t.compareTo("EMPTY") != 0) {
+                        Cursor.setX(list.get_abscissa_index(list.get_index_by_addr_mac(t)) - 180);   //Transformer en Constante globale
+                        Cursor.setY(list.get_ordinate_index(list.get_index_by_addr_mac(t)) - 180);
+                    }
+                    */
                 }
-            }
-        });
-        mBluetoothAdapter.startLeScan(mLeScanCallback);
+            });
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+        }
     }
 
 
@@ -266,10 +204,12 @@ public class Map extends Activity {
 
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
+                    Log.i("MAP", " BRAAAAAAAAAAAAAAAAAAAAAAAA");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(), device + " | " + rssi, Toast.LENGTH_SHORT).show();
+                            Log.i("MAP", "BEACON : " + device + " CT :");
                             list.list_find_by_add(device.toString(), rssi);
                         }
                     });

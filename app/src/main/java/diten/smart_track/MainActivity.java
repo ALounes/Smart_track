@@ -47,8 +47,8 @@ public class MainActivity extends Activity {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
-                    Intent setup = new Intent(MainActivity.this, Setup.class);
-                    startActivity(setup);
+                    Intent map = new Intent(MainActivity.this, Map.class);
+                    startActivity(map);
                     return true;
                 }
             };

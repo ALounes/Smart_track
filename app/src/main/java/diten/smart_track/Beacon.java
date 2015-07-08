@@ -10,15 +10,17 @@ public class Beacon implements Parcelable {
 
     String  addr_mac;
     int     RSSI;
+    int     numPacket;
     float   abscissa;
     float   ordinate;
     float   altitude;
     boolean detected;
 
-    Beacon(String addr_mac, int RSSI, float abscissa, float ordinate, float altitude)
+    Beacon(String addr_mac, int RSSI, int numPacket, float abscissa, float ordinate, float altitude)
     {
         this.addr_mac = addr_mac;
         this.RSSI = RSSI;
+        this.numPacket = numPacket;
         this.abscissa = abscissa;
         this.ordinate = ordinate;
         this.altitude = altitude;
@@ -81,6 +83,16 @@ public class Beacon implements Parcelable {
         this.RSSI = RSSI;
     }
 
+    void setNumPacket(int numPacket)
+    {
+        this.numPacket = numPacket;
+    }
+
+    void incrementNumPacket()
+    {
+        this.numPacket++;
+    }
+
     void setAbscissa(float abscissa){
         this.abscissa = abscissa;
     }
@@ -98,12 +110,18 @@ public class Beacon implements Parcelable {
     /*************************** Les Methodes de GET *********************************/
     /*********************************************************************************/
 
-    String get_addr_mac(){
+    String get_addr_mac()
+    {
         return addr_mac;
     }
 
     int getRSSI(){
         return RSSI;
+    }
+
+    int getNumPacket()
+    {
+        return numPacket;
     }
 
     float getAbscissa(){
